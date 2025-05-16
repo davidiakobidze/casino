@@ -43,27 +43,33 @@
     </div>
     <script>
     function getWMain() {
-      document.getElementById('message').textContent = 'Loading';
-      fetch('https://gt.wttr.in/?format=json&q=NY')
-        .then((res) => res.json())
+      fetch('https://wttr.in/New+York?format=j1')
+        .then(res => res.json())
         .then(data => {
           const weatherEl = document.getElementById('weather');
-          if (data && data.weather && data.weather.current || data.quote) {
-            const w = data.weather.current || data.quote;
-            weatherEl.attext = `
-              Temperature: ${w.degree+} C, ${w.description}
-              Wind: ${w.wind} m/s
-              Humidity: ${w.humidity} percent
-              Pressure: ${w.pressure} ha
-              Sun Rise: ${w.sunrise}
-              Description: ${w.description}
-            `; 
+          if (data && data.current_condition && data.current_condition[0]) {
+            const w = data.current_condition[0];
+            weatherEl.innerHTML = `
+              <strong>Temperature:</strong> ${w.temp_C}° C, ${w.weatherDesc[0].value}<br>
+              <strong>Wind:</strong> ${w.windspeeKMphph} km/h<br>
+              <strong>Humidity:</strong> ${w.humidity}%</strong><br>
+              <strong>Pressure:</strong> ${w.pressure} hPa<br>
+              <strong>Sunrise:</strong> ${data.weather[0].astronomy[0].sunrise}<br>
+              <strong>Sunset:</strong> ${data.weather[0].astronomy[0].sunset}
+              <br>
+            `;
+            document.querySelector('.weather-desc').textContent = `As of ${w.observation_time} UTC `;
           } else {
-            weatherEl.attext = "No weather information available.";
+            weatherEl.textContent = "No weather information available.";
+            document.querySelector('.weather-desc').textContent = "";
           }
         })
+        .catch(() => {
+          document.getElementById('weather').textContent = "Failed to load weather data.";
+          document.querySelector('.weather-desc').textContent = "";
+        });
     }
     getWMain();
-  </script>
-</body>
+    </script>
+  </body>
 </html>
